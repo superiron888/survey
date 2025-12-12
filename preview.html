@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Awareness · User Profile & Blind Spot Diagnosis V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Animations */
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        .slide-up { animation: slideUp 0.4s ease-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Smooth Transition */
+        .transition-all-300 { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-gray-900">
+
+    <!-- 1. Home Section -->
+    <div id="page-home" class="min-h-screen flex items-center justify-center p-4 fade-in">
+        <div class="max-w-4xl w-full">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Investment Awareness</h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">User Profile & Blind Spot Diagnosis V2</p>
+                <p class="text-gray-500 mt-4 max-w-xl mx-auto">This is not an ordinary survey, but a self-dialogue about your current investment state.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Cards -->
+                <button onclick="handleEntryClick('MBTI')" class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-blue-500">
+                    <div class="text-center">
+                        <div class="text-5xl mb-4">🧠</div>
+                        <h2 class="text-2xl font-bold mb-2">MBTI</h2>
+                        <p class="text-gray-600 text-sm">Start with your personality type</p>
+                    </div>
+                </button>
+                <button onclick="handleEntryClick('ZODIAC')" class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-blue-500">
+                    <div class="text-center">
+                        <div class="text-5xl mb-4">⭐</div>
+                        <h2 class="text-2xl font-bold mb-2">Zodiac</h2>
+                        <p class="text-gray-600 text-sm">Begin with your zodiac sign</p>
+                    </div>
+                </button>
+                <button onclick="handleEntryClick('CLASSIC')" class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-blue-500">
+                    <div class="text-center">
+                        <div class="text-5xl mb-4">📊</div>
+                        <h2 class="text-2xl font-bold mb-2">Classic</h2>
+                        <p class="text-gray-600 text-sm">Professional version</p>
+                    </div>
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-md mb-8">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">What you'll get:</h3>
+                <ul class="space-y-2 text-gray-600">
+                    <li class="flex items-center gap-2"><span class="text-green-500">✓</span>Comprehensive investment profile analysis</li>
+                    <li class="flex items-center gap-2"><span class="text-green-500">✓</span>Blind spot diagnosis</li>
+                    <li class="flex items-center gap-2"><span class="text-green-500">✓</span>Personalized growth recommendations</li>
+                </ul>
+            </div>
+
+            <p class="text-center text-sm text-gray-500">🔒 We never sell your data. Your information is encrypted.</p>
+        </div>
+    </div>
+
+    <!-- 2. Entry Selection (MBTI/Zodiac) -->
+    <div id="page-selection" class="hidden min-h-screen flex flex-col items-center justify-center p-4 fade-in bg-gray-50">
+        <div class="max-w-4xl w-full">
+            <button onclick="showPage('page-home')" class="mb-6 text-gray-500 hover:text-gray-800 flex items-center gap-2">← Back</button>
+            <h2 id="selection-title" class="text-3xl font-bold text-center mb-8 text-gray-900">Select your Type</h2>
+            
+            <div id="selection-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Items injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Email Modal -->
+    <div id="email-modal" class="fixed inset-0 bg-black/50 hidden z-50 overflow-y-auto opacity-0 transition-opacity duration-300">
+        <!-- Added wrapper div for improved centering -->
+        <div class="min-h-screen px-4 text-center flex items-center justify-center">
+             <!-- Modal Panel -->
+            <div class="inline-block w-full max-w-md p-8 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl relative scale-95 transition-transform duration-300">
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">×</button>
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">📧 Start Your Journey</h2>
+                    <p class="text-gray-600">Complete analysis report will be sent to your email</p>
+                </div>
+                <form onsubmit="handleStartSurvey(event)">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <input type="email" placeholder="your@email.com" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">Start Diagnosis</button>
+                </form>
+                <p class="mt-4 text-xs text-gray-500 text-center">🔒 We promise to protect your privacy</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Survey Section -->
+    <div id="page-survey" class="hidden min-h-screen bg-gray-50 pt-16 pb-12">
+        <!-- Progress Bar -->
+        <div class="fixed top-0 left-0 right-0 h-2 bg-gray-200 z-40">
+            <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <div class="fixed top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-medium text-gray-600 z-40 border border-gray-200">
+            <span id="question-counter">1</span> / <span id="total-count">21</span>
+        </div>
+
+        <div class="max-w-2xl mx-auto px-4">
+            <div id="question-container" class="bg-white rounded-2xl p-6 md:p-8 shadow-lg slide-up min-h-[400px]">
+                <!-- Question content injected by JS -->
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-between mt-8">
+                <button onclick="prevQuestion()" id="btn-prev" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 disabled:opacity-50 transition-colors" disabled>← Previous</button>
+                <button onclick="nextQuestion()" id="btn-next" class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 disabled:opacity-50 transition-colors hidden">Next →</button>
+                <button onclick="submitSurvey()" id="btn-submit" class="px-8 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 hidden">Submit Survey</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Report Section -->
+    <div id="page-report" class="hidden min-h-screen bg-gray-50 p-4 md:p-8 fade-in">
+        <div id="report-loading" class="flex flex-col items-center justify-center min-h-[80vh]">
+            <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mb-6"></div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Generating Report...</h2>
+            <p class="text-gray-600">AI is analyzing your investment profile (Estimated 1-2 mins)</p>
+        </div>
+
+        <div id="report-content" class="hidden max-w-4xl mx-auto space-y-8 slide-up">
+            <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
+                <div class="text-5xl mb-4">🎉</div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">Analysis Completed!</h1>
+                <p class="text-xl text-gray-600">The formal report will be sent to your email in <span class="font-bold text-blue-600">1-2 days</span>.</p>
+                <div class="mt-6 p-4 bg-green-50 rounded-lg inline-block text-green-700 font-medium">✓ Submitted Successfully</div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-8 shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-blue-500 pl-4">Join Our Innovation Lab</h2>
+                <div class="mb-8">
+                    <p class="text-gray-600 leading-relaxed text-lg mb-6">
+                        We are building a more in-depth investment analysis engine. This is an <strong>Innovation Lab Project</strong> and is completely <strong>free of charge</strong>.
+                        <br><br>
+                        Would you like to become our beta tester and get early access to advanced features?
+                    </p>
+                    
+                    <label class="flex items-start space-x-3 p-4 border rounded-xl hover:bg-gray-50 cursor-pointer transition-colors bg-blue-50 border-blue-100">
+                        <input type="checkbox" id="beta-tester" class="w-6 h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300 mt-0.5" onchange="handleBetaOptIn(this.checked)">
+                        <div>
+                            <span class="text-gray-900 font-bold">Yes, I'm interested.</span>
+                            <p class="text-sm text-gray-500 mt-1">I understand this is a free community project.</p>
+                        </div>
+                    </label>
+                    <p id="beta-thanks" class="text-green-600 mt-3 text-sm hidden font-medium">Thanks! We've noted your interest.</p>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button onclick="location.reload()" class="text-gray-400 hover:text-gray-600 text-sm">Return to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // --- Data Definitions ---
+        const MBTI_TYPES = ['INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP', 'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP'];
+        const ZODIAC_SIGNS = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+        
+        // Full Question Set from User's Request (English Translated)
+        const questions = [
+            {
+                id: 1, type: "single_choice",
+                title: "Which description best matches your current life stage?",
+                options: ["Just starting out (18-24)", "Basically stable (25-30)", "Responsibilities increasing (31-40)", "Stable accumulation (41-50)", "Finalizing layout (50+)"],
+                touch: "You're not choosing an age, but choosing who you are right now."
+            },
+            {
+                id: 2, type: "single_choice",
+                title: "What is your gender?",
+                options: ["Male", "Female", "Prefer not to say"]
+            },
+            {
+                id: 3, type: "single_choice",
+                title: "When your portfolio drops 15% in the short term, what is your most likely real reaction?",
+                options: ["Instinctively cut losses", "Hesitate repeatedly", "Analyze rationally, add positions", "Get emotionally excited"],
+                touch: "Your first reaction under pressure is more honest than any personality label."
+            },
+            {
+                id: 4, type: "single_choice",
+                title: "If you could only choose one most important investment path right now, what would it be?",
+                options: ["Steady accumulation", "Increase returns, accept volatility", "Prioritize retirement security", "Financial freedom ASAP", "Sustainable cash flow", "Haven't figured it out yet"],
+                touch: "When forced to choose one, you know what you really want."
+            },
+            {
+                id: 5, type: "multiple_choice",
+                title: "What investment areas are you currently mainly focusing on or participating in?",
+                options: ["Stocks / ETF", "Funds", "Crypto assets", "Futures / Options", "Other"],
+                allowOtherText: true,
+                touch: "Where you focus, your risk sensitivity is there."
+            },
+            {
+                id: 6, type: "single_choice",
+                title: "Which state best matches your current investment scale?",
+                options: ["Just starting to test", "Have some capital", "Systematic planning", "Scale management", "Asset allocation stage"],
+                touch: "Scale is not just a number, but your operational radius."
+            },
+            {
+                id: 7, type: "single_choice",
+                title: "How long have you been exposed to the investment market?",
+                options: ["Less than 1 year", "1-3 years", "3-5 years", "More than 5 years"],
+                touch: "The longer the time, the more you can see what detours you've taken."
+            },
+            {
+                id: 8, type: "single_choice",
+                title: "How often do you usually check your investments or market conditions?",
+                options: ["Multiple times a day", "Once a day", "A few times a week", "Occasionally"],
+                touch: "Check frequency is how you deal with uncertainty."
+            },
+            {
+                id: 9, type: "single_choice",
+                title: "Compared to yourself three years ago, which change are you closer to?",
+                options: ["Mentality has obviously matured", "Technical progress, but emotions haven't changed", "Become more anxious", "More laid-back/giving up", "Can't say"],
+                touch: "Investment growth is first mental growth."
+            },
+            {
+                id: 10, type: "multiple_choice",
+                title: "When you hesitate whether to operate, what are the real obstacles that most easily block you?",
+                options: ["Afraid of losses → dare not act", "Afraid of missing out → impulsively chase highs", "Too much information → unable to judge", "Don't know timing → keep procrastinating", "Lost before → mindset distorted", "No confidence → follow the crowd"],
+                touch: "Where you get stuck is your investment blind spot."
+            },
+            {
+                id: 11, type: "multiple_choice",
+                title: "What information sources do you mainly rely on for decision-making?",
+                options: ["Social media opinions", "KOL / Streamers", "Your own systematic research", "Friend recommendations", "Institutional research reports", "AI / Smart tools"],
+                alwaysShowInput: true,
+                inputPlaceholder: "Specific accounts or websites you follow...",
+                inputNote: "We will match learning objects based on your profile to see if it's currently optimal. Please notice: we only provide analysis, without suggestion.",
+                touch: "What you believe determines how you see the world."
+            },
+            {
+                id: 12, type: "single_choice",
+                title: "What is the maximum short-term drawdown you can accept so you can still sleep?",
+                options: ["5%", "10%", "20%", "30% or more"],
+                touch: "Drawdown threshold is your psychological safety boundary."
+            },
+            {
+                id: 13, type: "multiple_choice",
+                title: "What asset types do you currently actually hold?",
+                options: ["Cash", "Stocks / ETF", "Funds", "Crypto assets", "Bonds / Fixed income", "Other"],
+                allowOtherText: true,
+                touch: "Holdings are more honest than words."
+            },
+            {
+                id: 14, type: "ranking",
+                title: "When the following values cannot be combined, please rank them in order of your real trade-offs",
+                options: ["Returns", "Risk control", "Liquidity", "Learning and growth", "Wealth stability"],
+                touch: "Every ranking is a dialogue with your inner values."
+            },
+            {
+                id: 15, type: "single_choice",
+                title: "Which is closer to your main source of income?",
+                options: ["Salary", "Entrepreneurship / Freelance", "Investment returns", "Family support", "Other"],
+                touch: "Income structure determines the thickness of your safety cushion."
+            },
+            {
+                id: 16, type: "single_choice",
+                title: "What is closer to your ideal investment rhythm?",
+                options: ["Steady upward", "Acceptable volatility", "Willing to bear larger volatility", "Hot spot in and out type"],
+                touch: "Investment rhythm often reflects life rhythm."
+            },
+            {
+                id: 17, type: "single_choice",
+                title: "How much time are you willing to continuously invest in investing?",
+                options: ["More than 1 hour per day", "10-30 minutes per day", "1 hour per week", "The less the better"],
+                touch: "Time investment is your betting ratio on the future."
+            },
+            {
+                id: 18, type: "single_choice",
+                title: "What is your attitude towards smart investment / automation tools?",
+                options: ["Very willing to use", "Willing to try", "Not very willing", "Won't use"],
+                touch: "Are you willing to give some control to the system?"
+            },
+            {
+                id: 19, type: "multiple_choice",
+                title: "What kind of investment support do you most hope to get?",
+                options: ["Clear buy/sell references", "Systematic method framework", "Asset allocation logic", "Emotional management", "Hot spot tracking", "Investor community"],
+                touch: "The support you crave is exactly the barrier you want to cross."
+            },
+            {
+                id: 20, type: "single_choice",
+                title: "What are you most dissatisfied with in your current investment experience?",
+                options: ["Information too messy", "Content hard to understand", "No basis for decisions", "Tools too complex", "Unstable returns", "Lack of growth guidance"],
+                touch: "The most real pain points often point to your next breakthrough."
+            },
+            {
+                id: 21, type: "open_text",
+                title: "If I could only ask you one thing: What is the 'stuck point' you most want to solve in investing right now?",
+                placeholder: "e.g., don't know how to buy/sell, mentality collapses easily, always follow the crowd, no time to learn, too little capital, etc.",
+                touch: "The problem you're willing to write down seriously usually has been fermenting in your heart for a long time."
+            }
+        ];
+
+        let state = {
+            entryPoint: null,
+            subType: null, // e.g. INTJ or Aries
+            currentQIndex: 0,
+            answers: {},
+            betaOptIn: false
+        };
+
+        // --- Navigation Logic ---
+        
+        function showPage(pageId) {
+            document.querySelectorAll('body > div').forEach(el => el.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // 1. Entry Point Click
+        function handleEntryClick(entry) {
+            state.entryPoint = entry;
+            if (entry === 'CLASSIC') {
+                openModal();
+            } else {
+                renderSelectionGrid(entry);
+                showPage('page-selection');
+            }
+        }
+
+        // 2. Render Grid for MBTI/Zodiac
+        function renderSelectionGrid(type) {
+            const grid = document.getElementById('selection-grid');
+            const title = document.getElementById('selection-title');
+            const items = type === 'MBTI' ? MBTI_TYPES : ZODIAC_SIGNS;
+            
+            title.innerText = type === 'MBTI' ? "Select your MBTI Type" : "Select your Zodiac Sign";
+            
+            grid.innerHTML = items.map(item => `
+                <button onclick="handleSubTypeSelect('${item}')" class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md border-2 border-transparent hover:border-blue-500 transition-all text-center font-bold text-gray-700">
+                    ${item}
+                </button>
+            `).join('');
+        }
+
+        function handleSubTypeSelect(subType) {
+            state.subType = subType;
+            openModal();
+        }
+
+        // 3. Email Modal
+        function openModal() {
+            const modal = document.getElementById('email-modal');
+            const content = modal.querySelector('div>div'); // Select inner content wrapper
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('email-modal');
+            const content = modal.querySelector('div>div');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function handleStartSurvey(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = "Creating Session...";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                closeModal();
+                showPage('page-survey');
+                renderQuestion();
+            }, 800);
+        }
+
+        // 4. Survey Engine
+        function renderQuestion() {
+            const q = questions[state.currentQIndex];
+            const container = document.getElementById('question-container');
+            
+            // Progress
+            document.getElementById('question-counter').innerText = state.currentQIndex + 1;
+            document.getElementById('total-count').innerText = questions.length;
+            document.getElementById('progress-bar').style.width = `${((state.currentQIndex + 1) / questions.length) * 100}%`;
+
+            // Buttons
+            document.getElementById('btn-prev').disabled = state.currentQIndex === 0;
+            const isLast = state.currentQIndex === questions.length - 1;
+            document.getElementById('btn-submit').classList.toggle('hidden', !isLast);
+            
+            let html = `
+                <div class="mb-8 fade-in">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">${q.title}</h2>
+                    ${q.touch ? `<p class="text-sm text-blue-600 italic bg-blue-50 p-3 rounded-lg border border-blue-100 inline-block">${q.touch}</p>` : ''}
+                </div>
+            `;
+
+            // -- Single Choice --
+            if (q.type === 'single_choice') {
+                html += `<div class="space-y-3 fade-in">`;
+                q.options.forEach(opt => {
+                    const isSelected = state.answers[q.id] === opt;
+                    html += `
+                        <button onclick="handleSingleChoice('${opt}')" 
+                            class="w-full text-left p-4 rounded-lg border-2 transition-all duration-200
+                            ${isSelected ? 'border-blue-500 bg-blue-50 text-blue-700 font-semibold shadow-sm' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50 text-gray-700'}">
+                            ${opt}
+                        </button>
+                    `;
+                });
+                html += `</div>`;
+                document.getElementById('btn-next').classList.add('hidden');
+            } 
+            // -- Multiple Choice --
+            else if (q.type === 'multiple_choice') {
+                const answerData = state.answers[q.id] || { selected: [], otherText: '', alwaysInput: '' };
+                const selected = answerData.selected;
+                
+                html += `<div class="space-y-3 fade-in">`;
+                q.options.forEach(opt => {
+                    const isSelected = selected.includes(opt);
+                    const isOther = opt === 'Other';
+                    
+                    html += `
+                        <div class="space-y-2">
+                            <div onclick="handleMultiChoice('${opt}')" 
+                                class="cursor-pointer flex items-center p-4 rounded-lg border-2 transition-all duration-200
+                                ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}">
+                                <div class="w-5 h-5 rounded border ${isSelected ? 'bg-blue-500 border-blue-500' : 'border-gray-400 bg-white'} flex items-center justify-center mr-3">
+                                    ${isSelected ? '<span class="text-white text-xs">✓</span>' : ''}
+                                </div>
+                                <span class="${isSelected ? 'text-blue-900 font-medium' : 'text-gray-700'}">${opt}</span>
+                            </div>
+                            
+                            ${isOther && isSelected ? `
+                                <div class="pl-2 slide-up">
+                                    <input type="text" 
+                                        value="${answerData.otherText || ''}"
+                                        oninput="handleOtherText(this.value)"
+                                        placeholder="Other..." 
+                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                                    />
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+
+                // Special case for Q11 (Always Show Input)
+                if (q.alwaysShowInput) {
+                    html += `
+                        <div class="mt-6 slide-up bg-gray-50 p-4 rounded-xl border border-gray-200">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">${q.inputPlaceholder}</label>
+                            <input type="text" 
+                                value="${answerData.alwaysInput || ''}"
+                                oninput="handleAlwaysInput(this.value)"
+                                placeholder="e.g. @RayDalio, specific websites..." 
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm mb-2"
+                            />
+                            <p class="text-xs text-gray-500 leading-relaxed">
+                                <span class="font-bold">Note:</span> ${q.inputNote}
+                            </p>
+                        </div>
+                    `;
+                }
+
+                if(!isLast) document.getElementById('btn-next').classList.remove('hidden');
+            }
+            // -- Ranking --
+            else if (q.type === 'ranking') {
+                const ranked = state.answers[q.id] || [];
+                const available = q.options.filter(o => !ranked.includes(o));
+                const isComplete = ranked.length === q.options.length;
+
+                html += `
+                    <div class="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6 fade-in">
+                        <div class="flex justify-between mb-4">
+                            <h4 class="font-semibold text-gray-900">Your Ranking (${ranked.length}/${q.options.length})</h4>
+                            ${isComplete ? '<span class="text-green-600 font-bold bg-white px-2 py-1 rounded shadow-sm text-sm">✓ Complete</span>' : ''}
+                        </div>
+                        <div class="space-y-2 min-h-[50px]">
+                            ${ranked.length === 0 ? '<p class="text-gray-400 text-center text-sm py-4 italic">Tap options below to rank them</p>' : ''}
+                            ${ranked.map((opt, i) => `
+                                <div onclick="removeRanking('${opt}')" class="bg-white p-3 rounded-lg shadow-sm flex items-center justify-between cursor-pointer hover:bg-red-50 group slide-up border border-blue-100">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">${i+1}</span>
+                                        <span class="font-medium text-gray-800">${opt}</span>
+                                    </div>
+                                    <span class="text-gray-300 group-hover:text-red-500 font-bold">×</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                if (available.length > 0) {
+                    html += `
+                        <div class="fade-in">
+                            <h4 class="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">Available Options</h4>
+                            <div class="space-y-2">
+                                ${available.map(opt => `
+                                    <button onclick="addRanking('${opt}')" class="w-full text-left p-3 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 text-gray-600 transition-all font-medium">
+                                        + ${opt}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if(!isLast) document.getElementById('btn-next').classList.add('hidden');
+            }
+            // -- Open Text --
+            else if (q.type === 'open_text') {
+                const val = state.answers[q.id] || '';
+                html += `
+                    <div class="fade-in">
+                        <textarea 
+                            oninput="handleOpenText(this.value)"
+                            placeholder="${q.placeholder}"
+                            class="w-full p-4 border-2 border-gray-200 rounded-lg h-40 focus:border-blue-500 focus:outline-none resize-none transition-colors"
+                        >${val}</textarea>
+                    </div>
+                `;
+                if(!isLast) document.getElementById('btn-next').classList.remove('hidden');
+            }
+
+            container.innerHTML = html;
+        }
+
+        // --- Interaction Handlers ---
+
+        function handleSingleChoice(val) {
+            const q = questions[state.currentQIndex];
+            state.answers[q.id] = val;
+            renderQuestion();
+            setTimeout(() => { if (state.currentQIndex < questions.length - 1) nextQuestion(); }, 400);
+        }
+
+        function handleMultiChoice(val) {
+            const q = questions[state.currentQIndex];
+            let data = state.answers[q.id] || { selected: [], otherText: '', alwaysInput: '' };
+            
+            if (data.selected.includes(val)) {
+                data.selected = data.selected.filter(x => x !== val);
+                if (val === 'Other') data.otherText = ''; // Clear text if unchecked
+            } else {
+                data.selected.push(val);
+            }
+            
+            state.answers[q.id] = data;
+            renderQuestion();
+        }
+
+        function handleOtherText(text) {
+            const q = questions[state.currentQIndex];
+            let data = state.answers[q.id];
+            if (data) {
+                data.otherText = text;
+                state.answers[q.id] = data;
+            }
+        }
+        
+        function handleAlwaysInput(text) {
+             const q = questions[state.currentQIndex];
+             let data = state.answers[q.id] || { selected: [], otherText: '', alwaysInput: '' };
+             data.alwaysInput = text;
+             state.answers[q.id] = data;
+        }
+
+        function handleOpenText(text) {
+            const q = questions[state.currentQIndex];
+            state.answers[q.id] = text;
+        }
+
+        function addRanking(val) {
+            const q = questions[state.currentQIndex];
+            let ranked = state.answers[q.id] || [];
+            ranked.push(val);
+            state.answers[q.id] = ranked;
+            renderQuestion();
+            
+            if (ranked.length === q.options.length) {
+                setTimeout(() => { if (state.currentQIndex < questions.length - 1) nextQuestion(); }, 500);
+            }
+        }
+
+        function removeRanking(val) {
+            const q = questions[state.currentQIndex];
+            let ranked = state.answers[q.id] || [];
+            ranked = ranked.filter(x => x !== val);
+            state.answers[q.id] = ranked;
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (state.currentQIndex < questions.length - 1) {
+                state.currentQIndex++;
+                renderQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            if (state.currentQIndex > 0) {
+                state.currentQIndex--;
+                renderQuestion();
+            }
+        }
+
+        function submitSurvey() {
+            const btn = document.getElementById('btn-submit');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+            showPage('page-report');
+            setTimeout(() => {
+                document.getElementById('report-loading').classList.add('hidden');
+                document.getElementById('report-content').classList.remove('hidden');
+            }, 2000);
+        }
+        
+        function handleBetaOptIn(checked) {
+            state.betaOptIn = checked;
+            const msg = document.getElementById('beta-thanks');
+            if(checked) {
+                msg.classList.remove('hidden');
+                console.log("User opted in for beta testing");
+                // Here you would send this to backend
+            } else {
+                msg.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
