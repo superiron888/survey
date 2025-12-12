@@ -1,0 +1,76 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 用户表
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  entryPoint  EntryPoint @map("entry_point") // 入口来源
+  mbtiType    String?  @map("mbti_type")     // MBTI类型（可选）
+  zodiacSign  String?  @map("zodiac_sign")   // 星座（可选）
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  responses SurveyResponse[]
+  reports   AnalysisReport[]
+  
+  @@index([email])
+  @@map("users")
+}
+
+enum EntryPoint {
+  MBTI
+  ZODIAC
+  CLASSIC
+}
+
+// 问卷回答表
+model SurveyResponse {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  sessionId  String   @map("session_id")
+  questionId Int      @map("question_id")
+  answer     Json     // 支持各种答案类型
+  answeredAt DateTime @default(now()) @map("answered_at")
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([sessionId, questionId]) // 确保同一session同一题只能答一次
+  @@index([userId])
+  @@index([sessionId])
+  @@map("survey_responses")
+}
+
+// 分析报告表
+model AnalysisReport {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  sessionId     String   @unique @map("session_id")
+  reportContent Json     @map("report_content") // AI生成的完整报告
+  previewContent Json?   @map("preview_content") // 轻量预览版
+  status        ReportStatus @default(GENERATING)
+  emailSent     Boolean  @default(false) @map("email_sent")
+  errorMessage  String?  @map("error_message")
+  generatedAt   DateTime @default(now()) @map("generated_at")
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([sessionId])
+  @@map("analysis_reports")
+}
+
+enum ReportStatus {
+  GENERATING
+  COMPLETED
+  FAILED
+}
