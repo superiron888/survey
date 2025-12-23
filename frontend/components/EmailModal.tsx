@@ -32,20 +32,26 @@ export default function EmailModal({ isOpen, entryPoint, onClose }: EmailModalPr
       // Create user session
       const response = await api.createUser(email, entryPoint);
 
+      // Check if API returned an error
+      if (!response.success || !response.data) {
+        throw new Error(response.error?.message || 'Failed to create session');
+      }
+
       // Save to localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('userId', response.data!.userId);
-        localStorage.setItem('sessionId', response.data!.sessionId);
+        localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('sessionId', response.data.sessionId);
         localStorage.setItem('email', email);
       }
 
       // Navigate to corresponding entry
       if (entryPoint === 'CLASSIC') {
-        router.push(`/survey/${response.data!.sessionId}`);
+        router.push(`/survey/${response.data.sessionId}`);
       } else {
         router.push(`/entry/${entryPoint.toLowerCase()}`);
       }
     } catch (err: any) {
+      console.error('Create user error:', err);
       setError(err.message || 'Failed to create session, please try again');
       setLoading(false);
     }
