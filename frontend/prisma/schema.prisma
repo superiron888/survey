@@ -74,3 +74,17 @@ enum ReportStatus {
   COMPLETED
   FAILED
 }
+
+// 简化的问卷提交表（一行包含所有信息）
+model SurveySubmission {
+  id          String   @id @default(uuid())
+  email       String
+  entryPoint  String   @map("entry_point")
+  mbtiType    String?  @map("mbti_type")
+  zodiacSign  String?  @map("zodiac_sign")
+  answers     Json     // 所有答案 {"1": "answer1", "2": "answer2", ...}
+  submittedAt DateTime @default(now()) @map("submitted_at")
+  
+  @@index([email])
+  @@map("survey_submissions")
+}

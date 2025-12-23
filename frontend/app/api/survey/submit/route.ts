@@ -25,6 +25,29 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
 
+    // Get all answers for this session
+    const responses = await prisma.surveyResponse.findMany({
+      where: { sessionId },
+      orderBy: { questionId: 'asc' }
+    });
+
+    // Format answers as simple object: {"1": answer1, "2": answer2, ...}
+    const answers: Record<string, any> = {};
+    for (const response of responses) {
+      answers[response.questionId.toString()] = response.answer;
+    }
+
+    // Save to simplified survey_submissions table
+    await prisma.surveySubmission.create({
+      data: {
+        email: user.email,
+        entryPoint: user.entryPoint,
+        mbtiType: user.mbtiType,
+        zodiacSign: user.zodiacSign,
+        answers: answers
+      }
+    });
+
     // Create report record (Status: COMPLETED, pending manual review)
     await prisma.analysisReport.create({
       data: {
