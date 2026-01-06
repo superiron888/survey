@@ -20,9 +20,6 @@ export default function Home() {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Investment Awareness
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            User Profile & Blind Spot Diagnosis V2
-          </p>
           <p className="text-gray-500 mt-4 max-w-xl mx-auto">
             This is not an ordinary survey, but a self-dialogue about your current investment state.
           </p>
